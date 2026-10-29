@@ -2,106 +2,213 @@
 <html lang="ru">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+
+  <meta
+    name="viewport"
+    content="width=device-width, initial-scale=1, viewport-fit=cover"
+  >
 
   <title>Планировщик Терра</title>
 
   <meta name="theme-color" content="#123d7a">
-  <meta name="mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-capable" content="yes">
-  <meta name="apple-mobile-web-app-title" content="Планировщик Терра">
-  <meta name="apple-mobile-web-app-status-bar-style" content="default">
 
-  <link rel="manifest" href="./manifest.json">
-  <link rel="icon" type="image/png" sizes="192x192" href="./icon-192.png">
-  <link rel="apple-touch-icon" sizes="180x180" href="./icon-180.png">
+  <meta
+    name="mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-capable"
+    content="yes"
+  >
+
+  <meta
+    name="apple-mobile-web-app-title"
+    content="Планировщик Терра"
+  >
+
+  <meta
+    name="apple-mobile-web-app-status-bar-style"
+    content="default"
+  >
+
+  <link
+    rel="manifest"
+    href="./manifest.json"
+  >
+
+  <link
+    rel="icon"
+    type="image/png"
+    sizes="192x192"
+    href="./icon-192.png"
+  >
+
+  <link
+    rel="apple-touch-icon"
+    sizes="180x180"
+    href="./icon-180.png"
+  >
 
   <style>
-    * { box-sizing: border-box; }
 
-    html, body {
-      margin: 0;
-      min-height: 100%;
-      font-family: Arial, sans-serif;
-      background: #f4f7fb;
-      color: #17345f;
+    * {
+      box-sizing:border-box;
+    }
+
+    html,
+    body {
+      margin:0;
+      min-height:100%;
+      font-family:Arial,sans-serif;
+      background:#f4f7fb;
+      color:#17345f;
     }
 
     body {
-      min-height: 100vh;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      padding: 24px;
+      min-height:100vh;
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      padding:24px;
     }
 
     .card {
-      width: 100%;
-      max-width: 420px;
-      background: #ffffff;
-      border-radius: 22px;
-      padding: 28px 22px;
-      text-align: center;
-      box-shadow: 0 8px 30px rgba(22, 52, 95, 0.12);
+      width:100%;
+      max-width:420px;
+      background:#ffffff;
+      border-radius:22px;
+      padding:28px 22px;
+      text-align:center;
+      box-shadow:
+        0 8px 30px rgba(22,52,95,.12);
     }
 
     .icon {
-      width: 96px;
-      height: 96px;
-      margin: 0 auto 16px;
-      display: block;
+      width:110px;
+      height:110px;
+      margin:0 auto 18px;
+      display:block;
     }
 
     h1 {
-      margin: 0 0 8px;
-      font-size: 24px;
-      color: #123d7a;
+      margin:0 0 12px;
+      font-size:26px;
+      color:#123d7a;
     }
 
-    p {
-      margin: 0;
-      line-height: 1.45;
-      color: #64748b;
+    .text {
+      margin:0;
+      font-size:16px;
+      line-height:1.5;
+      color:#64748b;
+    }
+
+    .instruction {
+      margin-top:18px;
+      padding:14px 15px;
+      border-radius:14px;
+      background:#edf6ec;
+      color:#2f7236;
+      font-size:14px;
+      line-height:1.45;
+      font-weight:700;
+    }
+
+    .button {
+      width:100%;
+      min-height:52px;
+      margin-top:18px;
+      border:0;
+      border-radius:13px;
+      background:#123d7a;
+      color:#ffffff;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
     }
 
     .error {
-      color: #b52a35;
-      font-weight: 700;
+      margin-top:16px;
+      color:#b52a35;
+      font-weight:700;
     }
+
   </style>
 </head>
 
 <body>
 
   <div class="card">
-    <img class="icon" src="./icon-192.png" alt="">
-    <h1>Планировщик Терра</h1>
-    <p id="status">Открываем планировщик…</p>
+
+    <img
+      class="icon"
+      src="./icon-192.png"
+      alt="Планировщик Терра"
+    >
+
+    <h1>
+      Планировщик Терра
+    </h1>
+
+    <p
+      class="text"
+      id="status"
+    >
+      Персональная ссылка подключена.
+    </p>
+
+    <div
+      class="instruction"
+      id="instruction"
+    >
+      На iPhone нажмите «Поделиться» → «На экран Домой».
+      После установки запускайте Планировщик через зелёную иконку.
+    </div>
+
+    <button
+      class="button"
+      id="openButton"
+      type="button"
+      onclick="openPlanner()"
+    >
+      Открыть Планировщик
+    </button>
+
   </div>
 
+
   <script>
+
     const APP_SCRIPT_URL =
       'https://script.google.com/macros/s/AKfycbwKVkjnyGNPHg761ilsD39Y9MpSqZnOOCoWfNt9gS3n2IM827S2XDruOnYtUf78fz3LrA/exec';
 
+
     const TOKEN_STORAGE_KEY =
       'terra_planner_employee_token';
+
 
     const params =
       new URLSearchParams(
         window.location.search
       );
 
+
     const tokenFromLink =
       String(
         params.get('token') || ''
       ).trim();
 
+
     if (tokenFromLink) {
+
       localStorage.setItem(
         TOKEN_STORAGE_KEY,
         tokenFromLink
       );
+
     }
+
 
     const token =
       tokenFromLink ||
@@ -111,30 +218,112 @@
         ) || ''
       ).trim();
 
+
     const status =
       document.getElementById(
         'status'
       );
+
+
+    const instruction =
+      document.getElementById(
+        'instruction'
+      );
+
+
+    const openButton =
+      document.getElementById(
+        'openButton'
+      );
+
+
+    function getPlannerUrl() {
+
+      return (
+        APP_SCRIPT_URL +
+        '?token=' +
+        encodeURIComponent(token)
+      );
+
+    }
+
+
+    function openPlanner() {
+
+      if (!token) {
+        return;
+      }
+
+
+      window.location.href =
+        getPlannerUrl();
+
+    }
+
+
+    function isStandalone() {
+
+      const iosStandalone =
+        window.navigator.standalone === true;
+
+
+      const displayStandalone =
+        window.matchMedia &&
+        window.matchMedia(
+          '(display-mode: standalone)'
+        ).matches;
+
+
+      return (
+        iosStandalone ||
+        displayStandalone
+      );
+
+    }
+
 
     if (!token) {
 
       status.textContent =
         'Ссылка недействительна: отсутствует персональный токен.';
 
+
       status.className =
         'error';
 
-    } else {
 
-      const target =
-        APP_SCRIPT_URL +
-        '?token=' +
-        encodeURIComponent(token);
+      instruction.style.display =
+        'none';
 
-      window.location.replace(
-        target
+
+      openButton.style.display =
+        'none';
+
+    } else if (isStandalone()) {
+
+      status.textContent =
+        'Открываем Планировщик…';
+
+
+      instruction.style.display =
+        'none';
+
+
+      openButton.style.display =
+        'none';
+
+
+      setTimeout(
+        function() {
+
+          openPlanner();
+
+        },
+        500
       );
+
     }
+
   </script>
 
 </body>
