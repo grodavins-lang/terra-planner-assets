@@ -312,11 +312,21 @@
     );
 
 
+  const TOKEN_PARAM =
+    params.get(
+      'token'
+    );
+
+
+  const MODE_PARAM =
+    params.get(
+      'mode'
+    );
+
+
   let TOKEN =
     String(
-      params.get(
-        'token'
-      ) ||
+      TOKEN_PARAM ||
       localStorage.getItem(
         TOKEN_KEY
       ) ||
@@ -324,15 +334,27 @@
     ).trim();
 
 
+  /*
+    Если в URL пришёл новый токен сотрудника
+    без mode=control — это сотруднический режим.
+
+    Так сохранённый режим Контроля не может
+    случайно "прилипнуть" к ссылке сотрудника.
+  */
   let MODE =
     String(
-      params.get(
-        'mode'
-      ) ||
-      localStorage.getItem(
-        MODE_KEY
-      ) ||
-      ''
+      MODE_PARAM !== null
+        ? MODE_PARAM
+        : (
+            TOKEN_PARAM
+              ? ''
+              : (
+                  localStorage.getItem(
+                    MODE_KEY
+                  ) ||
+                  ''
+                )
+          )
     )
       .trim()
       .toLowerCase();
@@ -356,6 +378,14 @@
     localStorage.setItem(
       MODE_KEY,
       MODE
+    );
+
+  } else if (
+    TOKEN_PARAM
+  ) {
+
+    localStorage.removeItem(
+      MODE_KEY
     );
   }
 
@@ -487,6 +517,111 @@
   }
 
 
+  /*
+    Стабильный OneSignal ID сотрудника.
+
+    Сам мобильный токен в OneSignal не передаём:
+    используем SHA-256 от токена.
+  */
+  async function employeeExternalIdFromToken() {
+
+    if (
+      !TOKEN
+    ) {
+
+      return '';
+    }
+
+
+    if (
+      !window.crypto ||
+      !window.crypto.subtle
+    ) {
+
+      throw new Error(
+        'Браузер не поддерживает безопасную привязку уведомлений.'
+      );
+    }
+
+
+    const bytes =
+      new TextEncoder()
+        .encode(
+          TOKEN
+        );
+
+
+    const digest =
+      await window.crypto.subtle.digest(
+        'SHA-256',
+        bytes
+      );
+
+
+    const hex =
+      Array
+        .from(
+          new Uint8Array(
+            digest
+          )
+        )
+        .map(
+          function(value) {
+
+            return value
+              .toString(16)
+              .padStart(
+                2,
+                '0'
+              );
+          }
+        )
+        .join(
+          ''
+        );
+
+
+    return (
+      'terra:employee:' +
+      hex
+    );
+  }
+
+
+  async function loginOneSignalUser(
+    OneSignal
+  ) {
+
+    if (
+      IS_CONTROL
+    ) {
+
+      await OneSignal.login(
+        'terra:control'
+      );
+
+      return;
+    }
+
+
+    if (
+      !TOKEN
+    ) {
+
+      return;
+    }
+
+
+    const externalId =
+      await employeeExternalIdFromToken();
+
+
+    await OneSignal.login(
+      externalId
+    );
+  }
+
+
   window.OneSignalDeferred =
     window.OneSignalDeferred ||
     [];
@@ -520,14 +655,9 @@
         });
 
 
-        if (
-          IS_CONTROL
-        ) {
-
-          await OneSignal.login(
-            'terra:control'
-          );
-        }
+        await loginOneSignalUser(
+          OneSignal
+        );
 
 
         const permission =
@@ -616,14 +746,9 @@
 
         try {
 
-          if (
-            IS_CONTROL
-          ) {
-
-            await OneSignal.login(
-              'terra:control'
-            );
-          }
+          await loginOneSignalUser(
+            OneSignal
+          );
 
 
           await OneSignal
@@ -637,14 +762,9 @@
             .optIn();
 
 
-          if (
-            IS_CONTROL
-          ) {
-
-            await OneSignal.login(
-              'terra:control'
-            );
-          }
+          await loginOneSignalUser(
+            OneSignal
+          );
 
 
           const permission =
