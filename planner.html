@@ -7,7 +7,7 @@
 
   <meta
     name="viewport"
-    content="width=device-width, initial-scale=1, viewport-fit=cover"
+    content="width=device-width, initial-scale=1, maximum-scale=1, viewport-fit=cover"
   >
 
   <meta
@@ -30,21 +30,18 @@
     content="Терра"
   >
 
-  <title>Планировщик Терра</title>
-
+  <title>Терра</title>
 
   <link
     rel="manifest"
     href="./planner-manifest.json"
   >
 
-
   <link
     rel="apple-touch-icon"
     sizes="180x180"
     href="./terra-icon-v2-180.png"
   >
-
 
   <link
     rel="icon"
@@ -53,12 +50,10 @@
     href="./terra-icon-v2-192.png"
   >
 
-
   <script
     src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
     defer
   ></script>
-
 
   <style>
 
@@ -72,83 +67,87 @@
       background:#f4f7fb;
       font-family:Arial,sans-serif;
       color:#17345f;
-    }
-
-    .page {
-      min-height:100vh;
       display:flex;
-      align-items:center;
       justify-content:center;
-      padding:22px;
     }
 
-    .card {
+    .app {
       width:100%;
-      max-width:440px;
-      background:white;
-      border-radius:22px;
-      padding:25px 20px 22px;
-      box-shadow:0 6px 25px rgba(0,0,0,.10);
-      text-align:center;
+      max-width:720px;
+      min-height:100vh;
+      padding-bottom:30px;
     }
 
-    .logo {
-      width:90px;
-      height:90px;
-      margin:0 auto 14px;
-      border-radius:20px;
-      object-fit:cover;
+    .header {
+      background:linear-gradient(135deg,#123d7a,#2474d8);
+      color:white;
+      padding:30px 20px 25px;
+      border-radius:0 0 24px 24px;
     }
 
-    h1 {
-      margin:0;
-      font-size:25px;
-      color:#123d7a;
+    .title {
+      font-size:29px;
+      font-weight:800;
     }
 
     .subtitle {
-      margin-top:7px;
-      font-size:15px;
-      color:#68788c;
-      line-height:1.4;
+      margin-top:5px;
+      font-size:17px;
+      font-weight:700;
     }
 
     .mode {
       display:none;
-      margin:14px auto 0;
-      width:max-content;
-      max-width:100%;
+      margin-top:16px;
       padding:7px 11px;
       border-radius:20px;
-      background:#edf4ff;
-      color:#145da8;
+      background:rgba(255,255,255,.18);
       font-size:13px;
       font-weight:800;
     }
 
-    .mode.control {
-      display:block;
+    .mode.show {
+      display:inline-block;
     }
 
-    .buttons {
-      margin-top:22px;
-      display:grid;
-      gap:10px;
+    .content {
+      padding:18px 15px;
     }
 
-    button {
+    .card {
+      background:white;
+      border-radius:17px;
+      padding:18px;
+      box-shadow:0 3px 14px rgba(0,0,0,.08);
+      margin-bottom:12px;
+    }
+
+    .card-title {
+      font-size:18px;
+      font-weight:800;
+      color:#123d7a;
+    }
+
+    .card-text {
+      margin-top:8px;
+      font-size:14px;
+      line-height:1.45;
+      color:#65758a;
+    }
+
+    .button {
       width:100%;
-      min-height:50px;
+      min-height:52px;
+      margin-top:14px;
       border:0;
       border-radius:13px;
-      font-family:inherit;
       font-size:16px;
       font-weight:800;
       cursor:pointer;
     }
 
     .open-button {
-      background:#123d7a;
+      background:#1769d1;
       color:white;
     }
 
@@ -159,87 +158,83 @@
 
     .push-button:disabled {
       opacity:.55;
-      cursor:default;
-    }
-
-    .hint {
-      margin-top:17px;
-      color:#7b8798;
-      font-size:13px;
-      line-height:1.45;
     }
 
     .status {
-      margin-top:13px;
-      min-height:18px;
-      color:#64758b;
+      margin-top:12px;
+      padding:10px 12px;
+      border-radius:11px;
+      background:#f0f4f8;
+      color:#53657b;
       font-size:13px;
       line-height:1.4;
     }
 
-    .error {
-      color:#b52a35;
+    .status.ok {
+      background:#e9f7f0;
+      color:#147047;
+      font-weight:700;
     }
 
-    .success {
-      color:#168357;
+    .status.error {
+      background:#fff0f0;
+      color:#b52a35;
       font-weight:700;
+    }
+
+    .install-note {
+      margin-top:12px;
+      padding:13px;
+      border-radius:12px;
+      background:#fff8df;
+      color:#756016;
+      font-size:13px;
+      line-height:1.45;
     }
 
   </style>
 
 </head>
 
-
 <body>
 
-<div class="page">
+<div class="app">
 
-  <div class="card">
+  <div class="header">
 
-    <img
-      class="logo"
-      src="./terra-icon-v2-192.png"
-      alt="Терра"
-    >
-
-
-    <h1>
-      Планировщик Терра
-    </h1>
-
-
-    <div
-      class="subtitle"
-      id="subtitle"
-    >
-      Мобильный планировщик задач
+    <div class="title">
+      Терра
     </div>
 
+    <div class="subtitle">
+      Мобильный планировщик
+    </div>
 
     <div
       class="mode"
-      id="controlMode"
+      id="modeBadge"
     >
       👁 Режим контроля
     </div>
 
+  </div>
 
-    <div class="buttons">
+
+  <div class="content">
+
+    <div class="card">
+
+      <div class="card-title">
+        Планировщик
+      </div>
+
+      <div class="card-text">
+        Открыть задачи Терра.
+      </div>
 
       <button
-        class="push-button"
-        id="pushButton"
-        type="button"
-      >
-        🔔 Включить уведомления
-      </button>
-
-
-      <button
-        class="open-button"
-        id="openButton"
-        type="button"
+        class="button open-button"
+        onclick="openPlanner()"
       >
         Открыть Планировщик
       </button>
@@ -247,16 +242,42 @@
     </div>
 
 
-    <div
-      class="status"
-      id="status"
-    ></div>
+    <div class="card">
+
+      <div class="card-title">
+        Уведомления
+      </div>
+
+      <div class="card-text">
+        Разреши push-уведомления, чтобы получать сообщения о новых задачах и изменениях.
+      </div>
+
+      <button
+        class="button push-button"
+        id="pushButton"
+        onclick="enablePush()"
+      >
+        🔔 Разрешить уведомления
+      </button>
+
+      <div
+        class="status"
+        id="pushStatus"
+      >
+        Проверяем состояние уведомлений…
+      </div>
+
+    </div>
 
 
     <div
-      class="hint"
-      id="hint"
-    ></div>
+      class="install-note"
+      id="installNote"
+    >
+      На iPhone сначала добавь эту страницу на главный экран:
+      «Поделиться» → «На экран Домой».
+      Затем запускай Терра именно с новой иконки.
+    </div>
 
   </div>
 
@@ -277,11 +298,11 @@
     'web.onesignal.auto.235723f6-f2ef-49f2-bb5e-e966332d4e54';
 
 
-  const STORAGE_TOKEN =
+  const TOKEN_KEY =
     'terra_planner_token_v1';
 
 
-  const STORAGE_MODE =
+  const MODE_KEY =
     'terra_planner_mode_v1';
 
 
@@ -291,64 +312,52 @@
     );
 
 
-  const urlToken =
+  let TOKEN =
     String(
       params.get(
         'token'
-      ) || ''
+      ) ||
+      localStorage.getItem(
+        TOKEN_KEY
+      ) ||
+      ''
     ).trim();
 
 
-  const urlMode =
+  let MODE =
     String(
       params.get(
         'mode'
-      ) || ''
+      ) ||
+      localStorage.getItem(
+        MODE_KEY
+      ) ||
+      ''
     )
       .trim()
       .toLowerCase();
 
 
   if (
-    urlToken
+    TOKEN
   ) {
 
     localStorage.setItem(
-      STORAGE_TOKEN,
-      urlToken
+      TOKEN_KEY,
+      TOKEN
     );
   }
 
 
   if (
-    urlMode
+    MODE
   ) {
 
     localStorage.setItem(
-      STORAGE_MODE,
-      urlMode
+      MODE_KEY,
+      MODE
     );
   }
-
-
-  const TOKEN =
-    urlToken ||
-    String(
-      localStorage.getItem(
-        STORAGE_TOKEN
-      ) || ''
-    ).trim();
-
-
-  const MODE =
-    urlMode ||
-    String(
-      localStorage.getItem(
-        STORAGE_MODE
-      ) || ''
-    )
-      .trim()
-      .toLowerCase();
 
 
   const IS_CONTROL =
@@ -356,208 +365,126 @@
       'control';
 
 
-  const statusBox =
-    document.getElementById(
-      'status'
-    );
-
-
-  const hintBox =
-    document.getElementById(
-      'hint'
-    );
-
-
-  const pushButton =
-    document.getElementById(
-      'pushButton'
-    );
-
-
-  const openButton =
-    document.getElementById(
-      'openButton'
-    );
-
-
-  const controlMode =
-    document.getElementById(
-      'controlMode'
-    );
-
-
-  const subtitle =
-    document.getElementById(
-      'subtitle'
-    );
-
-
   if (
     IS_CONTROL
   ) {
 
-    controlMode
+    document
+      .getElementById(
+        'modeBadge'
+      )
       .classList
       .add(
-        'control'
+        'show'
+      );
+  }
+
+
+  function plannerUrl() {
+
+    let url =
+      APP_SCRIPT_URL +
+      '?token=' +
+      encodeURIComponent(
+        TOKEN
       );
 
 
-    subtitle.textContent =
-      'Просмотр задач компании';
+    if (
+      IS_CONTROL
+    ) {
+
+      url +=
+        '&mode=control';
+    }
+
+
+    return url;
+  }
+
+
+  function openPlanner() {
+
+    if (
+      !TOKEN
+    ) {
+
+      alert(
+        'В ссылке отсутствует токен доступа.'
+      );
+
+      return;
+    }
+
+
+    window.location.href =
+      plannerUrl();
   }
 
 
   function isStandalone() {
 
     return (
-      window.matchMedia(
-        '(display-mode: standalone)'
-      ).matches ||
-
-      window.navigator.standalone ===
-        true
-    );
+      window.matchMedia &&
+      window
+        .matchMedia(
+          '(display-mode: standalone)'
+        )
+        .matches
+    ) ||
+    window.navigator.standalone ===
+      true;
   }
 
 
-  function isIOS() {
+  function updateInstallHint() {
 
-    return /iphone|ipad|ipod/i
-      .test(
-        navigator.userAgent
-      );
-  }
-
-
-  function getPlannerUrl() {
-
-    if (
-      !TOKEN
-    ) {
-
-      return APP_SCRIPT_URL;
-    }
-
-
-    const url =
-      new URL(
-        APP_SCRIPT_URL
-      );
-
-
-    url.searchParams.set(
-      'token',
-      TOKEN
-    );
+    const note =
+      document
+        .getElementById(
+          'installNote'
+        );
 
 
     if (
-      IS_CONTROL
+      isStandalone()
     ) {
 
-      url.searchParams.set(
-        'mode',
-        'control'
-      );
+      note.style.display =
+        'none';
+
+    } else {
+
+      note.style.display =
+        'block';
     }
-
-
-    return url.toString();
   }
 
 
-  function showStatus(
+  function setPushStatus(
     text,
     type
   ) {
 
-    statusBox.textContent =
-      text || '';
-
-
-    statusBox.classList.remove(
-      'error',
-      'success'
-    );
-
-
-    if (
-      type
-    ) {
-
-      statusBox
-        .classList
-        .add(
-          type
+    const box =
+      document
+        .getElementById(
+          'pushStatus'
         );
-    }
+
+
+    box.textContent =
+      text;
+
+
+    box.className =
+      'status' +
+      (
+        type
+          ? ' ' + type
+          : ''
+      );
   }
-
-
-  function updateHint() {
-
-    if (
-      !TOKEN
-    ) {
-
-      hintBox.textContent =
-        'В этой ссылке отсутствует персональный токен доступа.';
-
-      return;
-    }
-
-
-    if (
-      isIOS() &&
-      !isStandalone()
-    ) {
-
-      hintBox.textContent =
-        'На iPhone для полноценной работы уведомлений добавьте Терру на экран «Домой» через меню «Поделиться».';
-
-      return;
-    }
-
-
-    if (
-      IS_CONTROL
-    ) {
-
-      hintBox.textContent =
-        'Это ваш личный контрольный доступ. Не передавайте эту ссылку сотрудникам.';
-
-      return;
-    }
-
-
-    hintBox.textContent =
-      'Персональная мобильная версия Планировщика.';
-  }
-
-
-  openButton
-    .addEventListener(
-      'click',
-      function() {
-
-        if (
-          !TOKEN
-        ) {
-
-          showStatus(
-            'Нет токена доступа.',
-            'error'
-          );
-
-          return;
-        }
-
-
-        window.location.href =
-          getPlannerUrl();
-      }
-    );
 
 
   window.OneSignalDeferred =
@@ -565,10 +492,8 @@
     [];
 
 
-  window.OneSignalDeferred.push(
-    async function(
-      OneSignal
-    ) {
+  OneSignalDeferred.push(
+    async function(OneSignal) {
 
       try {
 
@@ -595,31 +520,13 @@
         });
 
 
-        /*
-          Для контрольного аккаунта
-          закрепляем подписку за отдельным ID.
-
-          Для сотрудников это сделаем
-          отдельным следующим этапом.
-        */
-
         if (
           IS_CONTROL
         ) {
 
-          try {
-
-            await OneSignal.login(
-              'terra:control'
-            );
-
-          } catch (error) {
-
-            console.log(
-              'OneSignal login:',
-              error
-            );
-          }
+          await OneSignal.login(
+            'terra:control'
+          );
         }
 
 
@@ -628,122 +535,35 @@
             .permission;
 
 
+        const optedIn =
+          OneSignal.User
+            .PushSubscription
+            .optedIn;
+
+
         if (
-          permission
+          permission &&
+          optedIn
         ) {
 
-          pushButton.textContent =
-            '✓ Уведомления включены';
+          setPushStatus(
+            'Уведомления включены.',
+            'ok'
+          );
 
+        } else {
 
-          showStatus(
-            'Push-уведомления разрешены.',
-            'success'
+          setPushStatus(
+            isStandalone()
+              ? 'Уведомления пока не включены.'
+              : 'Сначала добавь Терра на главный экран iPhone.'
           );
         }
 
-
-        pushButton
-          .addEventListener(
-            'click',
-            async function() {
-
-              pushButton.disabled =
-                true;
-
-
-              showStatus(
-                'Подключаем уведомления…'
-              );
-
-
-              try {
-
-                await OneSignal
-                  .Notifications
-                  .requestPermission();
-
-
-                try {
-
-                  await OneSignal
-                    .User
-                    .PushSubscription
-                    .optIn();
-
-                } catch (error) {
-
-                  console.log(
-                    'OneSignal optIn:',
-                    error
-                  );
-                }
-
-
-                if (
-                  IS_CONTROL
-                ) {
-
-                  try {
-
-                    await OneSignal.login(
-                      'terra:control'
-                    );
-
-                  } catch (error) {
-
-                    console.log(
-                      'OneSignal login:',
-                      error
-                    );
-                  }
-                }
-
-
-                if (
-                  OneSignal.Notifications
-                    .permission
-                ) {
-
-                  pushButton.textContent =
-                    '✓ Уведомления включены';
-
-
-                  showStatus(
-                    'Уведомления успешно включены.',
-                    'success'
-                  );
-
-                } else {
-
-                  showStatus(
-                    'Разрешение на уведомления не выдано.',
-                    'error'
-                  );
-                }
-
-              } catch (error) {
-
-                showStatus(
-                  error &&
-                  error.message
-                    ? error.message
-                    : 'Не удалось включить уведомления.',
-                  'error'
-                );
-
-              } finally {
-
-                pushButton.disabled =
-                  false;
-              }
-            }
-          );
-
       } catch (error) {
 
-        showStatus(
-          'OneSignal пока не подключён: ' +
+        setPushStatus(
+          'Ошибка инициализации уведомлений: ' +
           (
             error &&
             error.message
@@ -755,11 +575,134 @@
           'error'
         );
       }
+
     }
   );
 
 
-  updateHint();
+  function enablePush() {
+
+    if (
+      !isStandalone()
+    ) {
+
+      setPushStatus(
+        'Сначала добавь Терра на главный экран и открой приложение с иконки.',
+        'error'
+      );
+
+      return;
+    }
+
+
+    const button =
+      document
+        .getElementById(
+          'pushButton'
+        );
+
+
+    button.disabled =
+      true;
+
+
+    setPushStatus(
+      'Запрашиваем разрешение…'
+    );
+
+
+    OneSignalDeferred.push(
+      async function(OneSignal) {
+
+        try {
+
+          if (
+            IS_CONTROL
+          ) {
+
+            await OneSignal.login(
+              'terra:control'
+            );
+          }
+
+
+          await OneSignal
+            .Notifications
+            .requestPermission();
+
+
+          await OneSignal
+            .User
+            .PushSubscription
+            .optIn();
+
+
+          if (
+            IS_CONTROL
+          ) {
+
+            await OneSignal.login(
+              'terra:control'
+            );
+          }
+
+
+          const permission =
+            OneSignal
+              .Notifications
+              .permission;
+
+
+          const optedIn =
+            OneSignal
+              .User
+              .PushSubscription
+              .optedIn;
+
+
+          if (
+            permission &&
+            optedIn
+          ) {
+
+            setPushStatus(
+              'Уведомления включены.',
+              'ok'
+            );
+
+          } else {
+
+            setPushStatus(
+              'Разрешение на уведомления не получено.',
+              'error'
+            );
+          }
+
+        } catch (error) {
+
+          setPushStatus(
+            error &&
+            error.message
+              ? error.message
+              : String(
+                  error ||
+                  'Не удалось включить уведомления.'
+                ),
+            'error'
+          );
+
+        } finally {
+
+          button.disabled =
+            false;
+        }
+
+      }
+    );
+  }
+
+
+  updateInstallHint();
 
 </script>
 
