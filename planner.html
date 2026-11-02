@@ -33,10 +33,14 @@
   >
 
 
-  <!-- ВАЖНО:
-       manifest здесь специально НЕ подключаем -->
+  <!-- Manifest именно для оболочки Планировщика -->
+  <link
+    rel="manifest"
+    href="./planner-manifest.json"
+  >
 
 
+  <!-- Наша существующая иконка Терры -->
   <link
     rel="apple-touch-icon"
     sizes="180x180"
@@ -51,26 +55,46 @@
   >
 
 
+  <!-- OneSignal Web SDK -->
+  <script
+    src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
+    defer
+  ></script>
+
+
   <style>
 
     * {
       box-sizing:border-box;
     }
 
+
     html,
     body {
+
       margin:0;
+
       width:100%;
+
       min-height:100%;
-      font-family:Arial,sans-serif;
-      background:#f4f7fb;
-      color:#17345f;
+
+      font-family:
+        Arial,
+        sans-serif;
+
+      background:
+        #f4f7fb;
+
+      color:
+        #17345f;
+
     }
 
 
     body {
 
-      min-height:100vh;
+      min-height:
+        100vh;
 
       display:flex;
 
@@ -78,27 +102,40 @@
 
       justify-content:center;
 
-      padding:24px;
+      padding:
+        24px;
 
     }
 
 
     .card {
 
-      width:100%;
+      width:
+        100%;
 
-      max-width:420px;
+      max-width:
+        420px;
 
-      background:white;
+      background:
+        white;
 
-      border-radius:22px;
+      border-radius:
+        22px;
 
-      padding:28px 22px;
+      padding:
+        28px 22px;
 
-      text-align:center;
+      text-align:
+        center;
 
       box-shadow:
-        0 8px 30px rgba(22,52,95,.12);
+        0 8px 30px
+        rgba(
+          22,
+          52,
+          95,
+          .12
+        );
 
     }
 
@@ -107,14 +144,17 @@
 
       display:block;
 
-      width:110px;
+      width:
+        110px;
 
-      height:110px;
+      height:
+        110px;
 
       margin:
         0 auto 18px;
 
-      border-radius:24px;
+      border-radius:
+        24px;
 
     }
 
@@ -124,77 +164,150 @@
       margin:
         0 0 12px;
 
-      font-size:26px;
+      font-size:
+        26px;
 
-      color:#123d7a;
+      color:
+        #123d7a;
 
     }
 
 
     .text {
 
-      margin:0;
+      margin:
+        0;
 
-      font-size:16px;
+      font-size:
+        16px;
 
-      line-height:1.5;
+      line-height:
+        1.5;
 
-      color:#64748b;
+      color:
+        #64748b;
 
     }
 
 
     .instruction {
 
-      margin-top:18px;
+      margin-top:
+        18px;
 
-      padding:14px 15px;
+      padding:
+        14px 15px;
 
-      border-radius:14px;
+      border-radius:
+        14px;
 
-      background:#edf6ec;
+      background:
+        #edf6ec;
 
-      color:#2f7236;
+      color:
+        #2f7236;
 
-      font-size:14px;
+      font-size:
+        14px;
 
-      line-height:1.45;
+      line-height:
+        1.45;
 
-      font-weight:700;
+      font-weight:
+        700;
 
     }
 
 
     .button {
 
-      width:100%;
+      width:
+        100%;
 
-      min-height:52px;
+      min-height:
+        52px;
 
-      margin-top:18px;
+      margin-top:
+        12px;
 
-      border:0;
+      border:
+        0;
 
-      border-radius:13px;
+      border-radius:
+        13px;
 
-      background:#123d7a;
+      background:
+        #123d7a;
 
-      color:white;
+      color:
+        white;
 
-      font-size:16px;
+      font-size:
+        16px;
 
-      font-weight:800;
+      font-weight:
+        800;
+
+      cursor:
+        pointer;
+
+    }
+
+
+    .button-push {
+
+      background:
+        #198754;
+
+    }
+
+
+    .button-push.enabled {
+
+      background:
+        #2f7d46;
+
+    }
+
+
+    .button:disabled {
+
+      cursor:
+        default;
+
+      opacity:
+        .75;
 
     }
 
 
     .error {
 
-      margin-top:16px;
+      margin-top:
+        16px;
 
-      color:#b52a35;
+      color:
+        #b52a35;
 
-      font-weight:700;
+      font-weight:
+        700;
+
+    }
+
+
+    .small {
+
+      margin-top:
+        12px;
+
+      color:
+        #7b8798;
+
+      font-size:
+        12px;
+
+      line-height:
+        1.4;
 
     }
 
@@ -234,23 +347,42 @@
       id="instruction"
     >
 
-      На iPhone нажмите
-      «Поделиться» →
+      На iPhone откройте эту страницу
+      в Safari и добавьте её
       «На экран Домой».
 
     </div>
 
 
     <button
+      class="button button-push"
+      id="pushButton"
+      type="button"
+      style="display:none"
+    >
+
+      🔔 Включить уведомления
+
+    </button>
+
+
+    <button
       class="button"
       id="openButton"
       type="button"
-      onclick="openPlanner()"
     >
 
       Открыть Планировщик
 
     </button>
+
+
+    <div
+      class="small"
+      id="pushInfo"
+      style="display:none"
+    >
+    </div>
 
 
   </div>
@@ -259,8 +391,30 @@
   <script>
 
 
+    /*
+     * ========================================================
+     * НАСТРОЙКИ
+     * ========================================================
+     */
+
+
     const APP_SCRIPT_URL =
       'https://script.google.com/macros/s/AKfycbwKVkjnyGNPHg761ilsD39Y9MpSqZnOOCoWfNt9gS3n2IM827S2XDruOnYtUf78fz3LrA/exec';
+
+
+    const ONESIGNAL_APP_ID =
+      '5b1ce8ac-9f13-4f9e-b297-5c1ad3e35c0a';
+
+
+    const ONESIGNAL_SAFARI_WEB_ID =
+      'web.onesignal.auto.235723f6-f2ef-49f2-bb5e-e966332d4e54';
+
+
+    /*
+     * ========================================================
+     * ЭЛЕМЕНТЫ
+     * ========================================================
+     */
 
 
     const params =
@@ -271,19 +425,26 @@
 
     const token =
       String(
-        params.get('token') || ''
+        params.get('token') ||
+        ''
       ).trim();
 
 
-    const status =
+    const statusElement =
       document.getElementById(
         'status'
       );
 
 
-    const instruction =
+    const instructionElement =
       document.getElementById(
         'instruction'
+      );
+
+
+    const pushButton =
+      document.getElementById(
+        'pushButton'
       );
 
 
@@ -293,12 +454,35 @@
       );
 
 
+    const pushInfo =
+      document.getElementById(
+        'pushInfo'
+      );
+
+
+    let oneSignalObject =
+      null;
+
+
+    let oneSignalReady =
+      false;
+
+
+    /*
+     * ========================================================
+     * ПЛАНИРОВЩИК
+     * ========================================================
+     */
+
+
     function getPlannerUrl() {
 
       return (
         APP_SCRIPT_URL +
         '?token=' +
-        encodeURIComponent(token)
+        encodeURIComponent(
+          token
+        )
       );
 
     }
@@ -306,8 +490,12 @@
 
     function openPlanner() {
 
-      if (!token) {
+      if (
+        !token
+      ) {
+
         return;
+
       }
 
 
@@ -317,27 +505,523 @@
     }
 
 
+    /*
+     * ========================================================
+     * ОПРЕДЕЛЕНИЕ УСТРОЙСТВА
+     * ========================================================
+     */
+
+
     function isStandalone() {
 
       return (
-        window.navigator.standalone === true
+
+        window.navigator
+          .standalone ===
+          true
+
+        ||
+
+        window.matchMedia(
+          '(display-mode: standalone)'
+        ).matches
+
       );
 
     }
 
 
-    if (!token) {
+    function isIOS() {
+
+      return (
+
+        /iPad|iPhone|iPod/
+          .test(
+            navigator.userAgent
+          )
+
+        ||
+
+        (
+          navigator.platform ===
+            'MacIntel'
+
+          &&
+
+          navigator.maxTouchPoints >
+            1
+        )
+
+      );
+
+    }
 
 
-      status.textContent =
+    /*
+     * ========================================================
+     * UI PUSH
+     * ========================================================
+     */
+
+
+    function showPushButton() {
+
+      pushButton.style.display =
+        'block';
+
+    }
+
+
+    function hidePushButton() {
+
+      pushButton.style.display =
+        'none';
+
+    }
+
+
+    function setPushEnabled() {
+
+      showPushButton();
+
+
+      pushButton.textContent =
+        '✓ Уведомления включены';
+
+
+      pushButton.disabled =
+        true;
+
+
+      pushButton.classList.add(
+        'enabled'
+      );
+
+
+      statusElement.textContent =
+        'Уведомления подключены.';
+
+
+      instructionElement.style.display =
+        'none';
+
+
+      pushInfo.style.display =
+        'block';
+
+
+      pushInfo.textContent =
+        'Теперь Терра сможет показывать системные push-уведомления.';
+
+    }
+
+
+    function setPushNotEnabled() {
+
+      showPushButton();
+
+
+      pushButton.disabled =
+        false;
+
+
+      pushButton.classList.remove(
+        'enabled'
+      );
+
+
+      pushButton.textContent =
+        '🔔 Включить уведомления';
+
+    }
+
+
+    /*
+     * ========================================================
+     * ПРОВЕРКА PUSH
+     * ========================================================
+     */
+
+
+    async function refreshPushStatus() {
+
+
+      if (
+        !oneSignalReady ||
+        !oneSignalObject
+      ) {
+
+        return;
+
+      }
+
+
+      try {
+
+
+        const supported =
+          oneSignalObject
+            .Notifications
+            .isPushSupported();
+
+
+        /*
+         * iPhone:
+         *
+         * Push работает только
+         * из web app с экрана Домой.
+         */
+
+
+        if (
+          isIOS() &&
+          !isStandalone()
+        ) {
+
+
+          hidePushButton();
+
+
+          statusElement.textContent =
+            'На iPhone уведомления включаются после установки Терры на экран Домой.';
+
+
+          instructionElement.style.display =
+            'block';
+
+
+          pushInfo.style.display =
+            'block';
+
+
+          pushInfo.textContent =
+            'Откройте «Поделиться» → «На экран Домой», затем запустите Терру с новой иконки.';
+
+
+          return;
+
+        }
+
+
+        if (
+          !supported
+        ) {
+
+
+          hidePushButton();
+
+
+          statusElement.textContent =
+            'Этот браузер не поддерживает push-уведомления.';
+
+
+          return;
+
+        }
+
+
+        const permission =
+          oneSignalObject
+            .Notifications
+            .permission ===
+            true;
+
+
+        const optedIn =
+          oneSignalObject
+            .User
+            .PushSubscription
+            .optedIn ===
+            true;
+
+
+        if (
+          permission &&
+          optedIn
+        ) {
+
+
+          setPushEnabled();
+
+
+          return;
+
+        }
+
+
+        setPushNotEnabled();
+
+
+        instructionElement.style.display =
+          'none';
+
+
+        statusElement.textContent =
+          'Нажмите «Включить уведомления».';
+
+
+      } catch (
+        error
+      ) {
+
+
+        console.error(
+          'Ошибка проверки push:',
+          error
+        );
+
+
+        setPushNotEnabled();
+
+      }
+
+    }
+
+
+    /*
+     * ========================================================
+     * ВКЛЮЧИТЬ PUSH
+     * ========================================================
+     */
+
+
+    async function enableNotifications() {
+
+
+      if (
+        !oneSignalReady ||
+        !oneSignalObject
+      ) {
+
+
+        statusElement.textContent =
+          'Система уведомлений ещё загружается.';
+
+
+        return;
+
+      }
+
+
+      if (
+        isIOS() &&
+        !isStandalone()
+      ) {
+
+
+        statusElement.textContent =
+          'Сначала добавьте Терру на экран Домой.';
+
+
+        instructionElement.style.display =
+          'block';
+
+
+        return;
+
+      }
+
+
+      try {
+
+
+        pushButton.disabled =
+          true;
+
+
+        pushButton.textContent =
+          'Подключаем…';
+
+
+        await oneSignalObject
+          .Notifications
+          .requestPermission();
+
+
+        const permission =
+          oneSignalObject
+            .Notifications
+            .permission ===
+            true;
+
+
+        if (
+          permission
+        ) {
+
+
+          await oneSignalObject
+            .User
+            .PushSubscription
+            .optIn();
+
+        }
+
+
+        await refreshPushStatus();
+
+
+      } catch (
+        error
+      ) {
+
+
+        console.error(
+          'Ошибка подключения push:',
+          error
+        );
+
+
+        pushButton.disabled =
+          false;
+
+
+        pushButton.textContent =
+          '🔔 Включить уведомления';
+
+
+        statusElement.textContent =
+          'Не удалось включить уведомления.';
+
+
+        pushInfo.style.display =
+          'block';
+
+
+        pushInfo.textContent =
+          'Проверьте разрешение уведомлений в настройках телефона.';
+
+      }
+
+    }
+
+
+    /*
+     * ========================================================
+     * ONESIGNAL
+     * ========================================================
+     */
+
+
+    window.OneSignalDeferred =
+      window.OneSignalDeferred ||
+      [];
+
+
+    OneSignalDeferred.push(
+
+      async function(
+        OneSignal
+      ) {
+
+
+        try {
+
+
+          await OneSignal.init({
+
+            appId:
+              ONESIGNAL_APP_ID,
+
+
+            safari_web_id:
+              ONESIGNAL_SAFARI_WEB_ID,
+
+
+            notifyButton: {
+
+              enable:
+                false
+
+            },
+
+
+            serviceWorkerPath:
+              '/terra-planner-assets/OneSignalSDKWorker.js',
+
+
+            serviceWorkerParam: {
+
+              scope:
+                '/terra-planner-assets/'
+
+            }
+
+          });
+
+
+          oneSignalObject =
+            OneSignal;
+
+
+          oneSignalReady =
+            true;
+
+
+          await refreshPushStatus();
+
+
+        } catch (
+          error
+        ) {
+
+
+          console.error(
+            'Ошибка OneSignal:',
+            error
+          );
+
+
+          statusElement.textContent =
+            'Планировщик доступен. Уведомления пока не подключены.';
+
+        }
+
+      }
+
+    );
+
+
+    /*
+     * ========================================================
+     * КНОПКИ
+     * ========================================================
+     */
+
+
+    openButton.addEventListener(
+      'click',
+      openPlanner
+    );
+
+
+    pushButton.addEventListener(
+      'click',
+      enableNotifications
+    );
+
+
+    /*
+     * ========================================================
+     * СТАРТ
+     * ========================================================
+     */
+
+
+    if (
+      !token
+    ) {
+
+
+      statusElement.textContent =
         'Ссылка недействительна: отсутствует персональный токен.';
 
 
-      status.className =
+      statusElement.className =
         'error';
 
 
-      instruction.style.display =
+      instructionElement.style.display =
         'none';
 
 
@@ -345,44 +1029,37 @@
         'none';
 
 
+      pushButton.style.display =
+        'none';
+
+
     } else {
 
 
-      status.textContent =
+      statusElement.textContent =
         'Персональная ссылка подключена.';
 
 
       /*
-        Если страницу открыли уже
-        через ярлык на экране iPhone,
-        сразу запускаем Планировщик.
-      */
+       * Теперь специально НЕ переходим
+       * автоматически в Apps Script.
+       *
+       * Нам нужно дать человеку возможность
+       * сначала включить push.
+       */
+
 
       if (
         isStandalone()
       ) {
 
 
-        status.textContent =
-          'Открываем Планировщик…';
+        statusElement.textContent =
+          'Проверяем уведомления…';
 
 
-        instruction.style.display =
+        instructionElement.style.display =
           'none';
-
-
-        openButton.style.display =
-          'none';
-
-
-        setTimeout(
-          function() {
-
-            openPlanner();
-
-          },
-          500
-        );
 
       }
 
