@@ -10,16 +10,14 @@
     content="width=device-width, initial-scale=1, viewport-fit=cover"
   >
 
-  <title>Планировщик Терра</title>
+  <meta
+    name="theme-color"
+    content="#123d7a"
+  >
 
   <meta
     name="apple-mobile-web-app-capable"
     content="yes"
-  >
-
-  <meta
-    name="apple-mobile-web-app-title"
-    content="Планировщик Терра"
   >
 
   <meta
@@ -28,34 +26,34 @@
   >
 
   <meta
-    name="theme-color"
-    content="#123d7a"
+    name="apple-mobile-web-app-title"
+    content="Терра"
   >
 
+  <title>Планировщик Терра</title>
 
-  <!-- Manifest именно для оболочки Планировщика -->
+
   <link
     rel="manifest"
     href="./planner-manifest.json"
   >
 
 
-  <!-- Наша существующая иконка Терры -->
   <link
     rel="apple-touch-icon"
     sizes="180x180"
-    href="./terra-icon-v2-180.png?v=3"
+    href="./terra-icon-v2-180.png"
   >
+
 
   <link
     rel="icon"
     type="image/png"
     sizes="192x192"
-    href="./terra-icon-v2-192.png?v=3"
+    href="./terra-icon-v2-192.png"
   >
 
 
-  <!-- OneSignal Web SDK -->
   <script
     src="https://cdn.onesignal.com/sdks/web/v16/OneSignalSDK.page.js"
     defer
@@ -68,247 +66,124 @@
       box-sizing:border-box;
     }
 
-
-    html,
     body {
-
       margin:0;
-
-      width:100%;
-
-      min-height:100%;
-
-      font-family:
-        Arial,
-        sans-serif;
-
-      background:
-        #f4f7fb;
-
-      color:
-        #17345f;
-
+      min-height:100vh;
+      background:#f4f7fb;
+      font-family:Arial,sans-serif;
+      color:#17345f;
     }
 
-
-    body {
-
-      min-height:
-        100vh;
-
+    .page {
+      min-height:100vh;
       display:flex;
-
       align-items:center;
-
       justify-content:center;
-
-      padding:
-        24px;
-
+      padding:22px;
     }
-
 
     .card {
-
-      width:
-        100%;
-
-      max-width:
-        420px;
-
-      background:
-        white;
-
-      border-radius:
-        22px;
-
-      padding:
-        28px 22px;
-
-      text-align:
-        center;
-
-      box-shadow:
-        0 8px 30px
-        rgba(
-          22,
-          52,
-          95,
-          .12
-        );
-
+      width:100%;
+      max-width:440px;
+      background:white;
+      border-radius:22px;
+      padding:25px 20px 22px;
+      box-shadow:0 6px 25px rgba(0,0,0,.10);
+      text-align:center;
     }
 
-
-    .icon {
-
-      display:block;
-
-      width:
-        110px;
-
-      height:
-        110px;
-
-      margin:
-        0 auto 18px;
-
-      border-radius:
-        24px;
-
+    .logo {
+      width:90px;
+      height:90px;
+      margin:0 auto 14px;
+      border-radius:20px;
+      object-fit:cover;
     }
-
 
     h1 {
-
-      margin:
-        0 0 12px;
-
-      font-size:
-        26px;
-
-      color:
-        #123d7a;
-
+      margin:0;
+      font-size:25px;
+      color:#123d7a;
     }
 
-
-    .text {
-
-      margin:
-        0;
-
-      font-size:
-        16px;
-
-      line-height:
-        1.5;
-
-      color:
-        #64748b;
-
+    .subtitle {
+      margin-top:7px;
+      font-size:15px;
+      color:#68788c;
+      line-height:1.4;
     }
 
-
-    .instruction {
-
-      margin-top:
-        18px;
-
-      padding:
-        14px 15px;
-
-      border-radius:
-        14px;
-
-      background:
-        #edf6ec;
-
-      color:
-        #2f7236;
-
-      font-size:
-        14px;
-
-      line-height:
-        1.45;
-
-      font-weight:
-        700;
-
+    .mode {
+      display:none;
+      margin:14px auto 0;
+      width:max-content;
+      max-width:100%;
+      padding:7px 11px;
+      border-radius:20px;
+      background:#edf4ff;
+      color:#145da8;
+      font-size:13px;
+      font-weight:800;
     }
 
-
-    .button {
-
-      width:
-        100%;
-
-      min-height:
-        52px;
-
-      margin-top:
-        12px;
-
-      border:
-        0;
-
-      border-radius:
-        13px;
-
-      background:
-        #123d7a;
-
-      color:
-        white;
-
-      font-size:
-        16px;
-
-      font-weight:
-        800;
-
-      cursor:
-        pointer;
-
+    .mode.control {
+      display:block;
     }
 
-
-    .button-push {
-
-      background:
-        #198754;
-
+    .buttons {
+      margin-top:22px;
+      display:grid;
+      gap:10px;
     }
 
-
-    .button-push.enabled {
-
-      background:
-        #2f7d46;
-
+    button {
+      width:100%;
+      min-height:50px;
+      border:0;
+      border-radius:13px;
+      font-family:inherit;
+      font-size:16px;
+      font-weight:800;
+      cursor:pointer;
     }
 
-
-    .button:disabled {
-
-      cursor:
-        default;
-
-      opacity:
-        .75;
-
+    .open-button {
+      background:#123d7a;
+      color:white;
     }
 
+    .push-button {
+      background:#168357;
+      color:white;
+    }
+
+    .push-button:disabled {
+      opacity:.55;
+      cursor:default;
+    }
+
+    .hint {
+      margin-top:17px;
+      color:#7b8798;
+      font-size:13px;
+      line-height:1.45;
+    }
+
+    .status {
+      margin-top:13px;
+      min-height:18px;
+      color:#64758b;
+      font-size:13px;
+      line-height:1.4;
+    }
 
     .error {
-
-      margin-top:
-        16px;
-
-      color:
-        #b52a35;
-
-      font-weight:
-        700;
-
+      color:#b52a35;
     }
 
-
-    .small {
-
-      margin-top:
-        12px;
-
-      color:
-        #7b8798;
-
-      font-size:
-        12px;
-
-      line-height:
-        1.4;
-
+    .success {
+      color:#168357;
+      font-weight:700;
     }
 
   </style>
@@ -318,14 +193,14 @@
 
 <body>
 
+<div class="page">
 
   <div class="card">
 
-
     <img
-      class="icon"
-      src="./terra-icon-v2-192.png?v=3"
-      alt="Планировщик Терра"
+      class="logo"
+      src="./terra-icon-v2-192.png"
+      alt="Терра"
     >
 
 
@@ -334,740 +209,559 @@
     </h1>
 
 
-    <p
-      class="text"
+    <div
+      class="subtitle"
+      id="subtitle"
+    >
+      Мобильный планировщик задач
+    </div>
+
+
+    <div
+      class="mode"
+      id="controlMode"
+    >
+      👁 Режим контроля
+    </div>
+
+
+    <div class="buttons">
+
+      <button
+        class="push-button"
+        id="pushButton"
+        type="button"
+      >
+        🔔 Включить уведомления
+      </button>
+
+
+      <button
+        class="open-button"
+        id="openButton"
+        type="button"
+      >
+        Открыть Планировщик
+      </button>
+
+    </div>
+
+
+    <div
+      class="status"
       id="status"
-    >
-      Проверяем персональную ссылку…
-    </p>
+    ></div>
 
 
     <div
-      class="instruction"
-      id="instruction"
-    >
-
-      На iPhone откройте эту страницу
-      в Safari и добавьте её
-      «На экран Домой».
-
-    </div>
-
-
-    <button
-      class="button button-push"
-      id="pushButton"
-      type="button"
-      style="display:none"
-    >
-
-      🔔 Включить уведомления
-
-    </button>
-
-
-    <button
-      class="button"
-      id="openButton"
-      type="button"
-    >
-
-      Открыть Планировщик
-
-    </button>
-
-
-    <div
-      class="small"
-      id="pushInfo"
-      style="display:none"
-    >
-    </div>
-
+      class="hint"
+      id="hint"
+    ></div>
 
   </div>
 
-
-  <script>
-
-
-    /*
-     * ========================================================
-     * НАСТРОЙКИ
-     * ========================================================
-     */
+</div>
 
 
-    const APP_SCRIPT_URL =
-      'https://script.google.com/macros/s/AKfycbwKVkjnyGNPHg761ilsD39Y9MpSqZnOOCoWfNt9gS3n2IM827S2XDruOnYtUf78fz3LrA/exec';
+<script>
+
+  const APP_SCRIPT_URL =
+    'https://script.google.com/macros/s/AKfycbwKVkjnyGNPHg761ilsD39Y9MpSqZnOOCoWfNt9gS3n2IM827S2XDruOnYtUf78fz3LrA/exec';
 
 
-    const ONESIGNAL_APP_ID =
-      '5b1ce8ac-9f13-4f9e-b297-5c1ad3e35c0a';
+  const ONESIGNAL_APP_ID =
+    '5b1ce8ac-9f13-4f9e-b297-5c1ad3e35c0a';
 
 
-    const ONESIGNAL_SAFARI_WEB_ID =
-      'web.onesignal.auto.235723f6-f2ef-49f2-bb5e-e966332d4e54';
+  const ONESIGNAL_SAFARI_WEB_ID =
+    'web.onesignal.auto.235723f6-f2ef-49f2-bb5e-e966332d4e54';
 
 
-    /*
-     * ========================================================
-     * ЭЛЕМЕНТЫ
-     * ========================================================
-     */
+  const STORAGE_TOKEN =
+    'terra_planner_token_v1';
 
 
-    const params =
-      new URLSearchParams(
-        window.location.search
+  const STORAGE_MODE =
+    'terra_planner_mode_v1';
+
+
+  const params =
+    new URLSearchParams(
+      window.location.search
+    );
+
+
+  const urlToken =
+    String(
+      params.get(
+        'token'
+      ) || ''
+    ).trim();
+
+
+  const urlMode =
+    String(
+      params.get(
+        'mode'
+      ) || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  if (
+    urlToken
+  ) {
+
+    localStorage.setItem(
+      STORAGE_TOKEN,
+      urlToken
+    );
+  }
+
+
+  if (
+    urlMode
+  ) {
+
+    localStorage.setItem(
+      STORAGE_MODE,
+      urlMode
+    );
+  }
+
+
+  const TOKEN =
+    urlToken ||
+    String(
+      localStorage.getItem(
+        STORAGE_TOKEN
+      ) || ''
+    ).trim();
+
+
+  const MODE =
+    urlMode ||
+    String(
+      localStorage.getItem(
+        STORAGE_MODE
+      ) || ''
+    )
+      .trim()
+      .toLowerCase();
+
+
+  const IS_CONTROL =
+    MODE ===
+      'control';
+
+
+  const statusBox =
+    document.getElementById(
+      'status'
+    );
+
+
+  const hintBox =
+    document.getElementById(
+      'hint'
+    );
+
+
+  const pushButton =
+    document.getElementById(
+      'pushButton'
+    );
+
+
+  const openButton =
+    document.getElementById(
+      'openButton'
+    );
+
+
+  const controlMode =
+    document.getElementById(
+      'controlMode'
+    );
+
+
+  const subtitle =
+    document.getElementById(
+      'subtitle'
+    );
+
+
+  if (
+    IS_CONTROL
+  ) {
+
+    controlMode
+      .classList
+      .add(
+        'control'
       );
 
 
-    const token =
-      String(
-        params.get('token') ||
-        ''
-      ).trim();
+    subtitle.textContent =
+      'Просмотр задач компании';
+  }
 
 
-    const statusElement =
-      document.getElementById(
-        'status'
+  function isStandalone() {
+
+    return (
+      window.matchMedia(
+        '(display-mode: standalone)'
+      ).matches ||
+
+      window.navigator.standalone ===
+        true
+    );
+  }
+
+
+  function isIOS() {
+
+    return /iphone|ipad|ipod/i
+      .test(
+        navigator.userAgent
       );
+  }
 
 
-    const instructionElement =
-      document.getElementById(
-        'instruction'
-      );
+  function getPlannerUrl() {
 
+    if (
+      !TOKEN
+    ) {
 
-    const pushButton =
-      document.getElementById(
-        'pushButton'
-      );
-
-
-    const openButton =
-      document.getElementById(
-        'openButton'
-      );
-
-
-    const pushInfo =
-      document.getElementById(
-        'pushInfo'
-      );
-
-
-    let oneSignalObject =
-      null;
-
-
-    let oneSignalReady =
-      false;
-
-
-    /*
-     * ========================================================
-     * ПЛАНИРОВЩИК
-     * ========================================================
-     */
-
-
-    function getPlannerUrl() {
-
-      return (
-        APP_SCRIPT_URL +
-        '?token=' +
-        encodeURIComponent(
-          token
-        )
-      );
-
+      return APP_SCRIPT_URL;
     }
 
 
-    function openPlanner() {
+    const url =
+      new URL(
+        APP_SCRIPT_URL
+      );
 
-      if (
-        !token
-      ) {
 
-        return;
+    url.searchParams.set(
+      'token',
+      TOKEN
+    );
 
+
+    if (
+      IS_CONTROL
+    ) {
+
+      url.searchParams.set(
+        'mode',
+        'control'
+      );
+    }
+
+
+    return url.toString();
+  }
+
+
+  function showStatus(
+    text,
+    type
+  ) {
+
+    statusBox.textContent =
+      text || '';
+
+
+    statusBox.classList.remove(
+      'error',
+      'success'
+    );
+
+
+    if (
+      type
+    ) {
+
+      statusBox
+        .classList
+        .add(
+          type
+        );
+    }
+  }
+
+
+  function updateHint() {
+
+    if (
+      !TOKEN
+    ) {
+
+      hintBox.textContent =
+        'В этой ссылке отсутствует персональный токен доступа.';
+
+      return;
+    }
+
+
+    if (
+      isIOS() &&
+      !isStandalone()
+    ) {
+
+      hintBox.textContent =
+        'На iPhone для полноценной работы уведомлений добавьте Терру на экран «Домой» через меню «Поделиться».';
+
+      return;
+    }
+
+
+    if (
+      IS_CONTROL
+    ) {
+
+      hintBox.textContent =
+        'Это ваш личный контрольный доступ. Не передавайте эту ссылку сотрудникам.';
+
+      return;
+    }
+
+
+    hintBox.textContent =
+      'Персональная мобильная версия Планировщика.';
+  }
+
+
+  openButton
+    .addEventListener(
+      'click',
+      function() {
+
+        if (
+          !TOKEN
+        ) {
+
+          showStatus(
+            'Нет токена доступа.',
+            'error'
+          );
+
+          return;
+        }
+
+
+        window.location.href =
+          getPlannerUrl();
       }
+    );
 
 
-      window.location.href =
-        getPlannerUrl();
+  window.OneSignalDeferred =
+    window.OneSignalDeferred ||
+    [];
 
-    }
 
-
-    /*
-     * ========================================================
-     * ОПРЕДЕЛЕНИЕ УСТРОЙСТВА
-     * ========================================================
-     */
-
-
-    function isStandalone() {
-
-      return (
-
-        window.navigator
-          .standalone ===
-          true
-
-        ||
-
-        window.matchMedia(
-          '(display-mode: standalone)'
-        ).matches
-
-      );
-
-    }
-
-
-    function isIOS() {
-
-      return (
-
-        /iPad|iPhone|iPod/
-          .test(
-            navigator.userAgent
-          )
-
-        ||
-
-        (
-          navigator.platform ===
-            'MacIntel'
-
-          &&
-
-          navigator.maxTouchPoints >
-            1
-        )
-
-      );
-
-    }
-
-
-    /*
-     * ========================================================
-     * UI PUSH
-     * ========================================================
-     */
-
-
-    function showPushButton() {
-
-      pushButton.style.display =
-        'block';
-
-    }
-
-
-    function hidePushButton() {
-
-      pushButton.style.display =
-        'none';
-
-    }
-
-
-    function setPushEnabled() {
-
-      showPushButton();
-
-
-      pushButton.textContent =
-        '✓ Уведомления включены';
-
-
-      pushButton.disabled =
-        true;
-
-
-      pushButton.classList.add(
-        'enabled'
-      );
-
-
-      statusElement.textContent =
-        'Уведомления подключены.';
-
-
-      instructionElement.style.display =
-        'none';
-
-
-      pushInfo.style.display =
-        'block';
-
-
-      pushInfo.textContent =
-        'Теперь Терра сможет показывать системные push-уведомления.';
-
-    }
-
-
-    function setPushNotEnabled() {
-
-      showPushButton();
-
-
-      pushButton.disabled =
-        false;
-
-
-      pushButton.classList.remove(
-        'enabled'
-      );
-
-
-      pushButton.textContent =
-        '🔔 Включить уведомления';
-
-    }
-
-
-    /*
-     * ========================================================
-     * ПРОВЕРКА PUSH
-     * ========================================================
-     */
-
-
-    async function refreshPushStatus() {
-
-
-      if (
-        !oneSignalReady ||
-        !oneSignalObject
-      ) {
-
-        return;
-
-      }
-
+  window.OneSignalDeferred.push(
+    async function(
+      OneSignal
+    ) {
 
       try {
 
+        await OneSignal.init({
 
-        const supported =
-          oneSignalObject
-            .Notifications
-            .isPushSupported();
+          appId:
+            ONESIGNAL_APP_ID,
+
+          safari_web_id:
+            ONESIGNAL_SAFARI_WEB_ID,
+
+          notifyButton: {
+            enable:false
+          },
+
+          serviceWorkerPath:
+            '/terra-planner-assets/OneSignalSDKWorker.js',
+
+          serviceWorkerParam: {
+            scope:
+              '/terra-planner-assets/'
+          }
+
+        });
 
 
         /*
-         * iPhone:
-         *
-         * Push работает только
-         * из web app с экрана Домой.
-         */
+          Для контрольного аккаунта
+          закрепляем подписку за отдельным ID.
 
-
-        if (
-          isIOS() &&
-          !isStandalone()
-        ) {
-
-
-          hidePushButton();
-
-
-          statusElement.textContent =
-            'На iPhone уведомления включаются после установки Терры на экран Домой.';
-
-
-          instructionElement.style.display =
-            'block';
-
-
-          pushInfo.style.display =
-            'block';
-
-
-          pushInfo.textContent =
-            'Откройте «Поделиться» → «На экран Домой», затем запустите Терру с новой иконки.';
-
-
-          return;
-
-        }
-
+          Для сотрудников это сделаем
+          отдельным следующим этапом.
+        */
 
         if (
-          !supported
+          IS_CONTROL
         ) {
 
+          try {
 
-          hidePushButton();
+            await OneSignal.login(
+              'terra:control'
+            );
 
+          } catch (error) {
 
-          statusElement.textContent =
-            'Этот браузер не поддерживает push-уведомления.';
-
-
-          return;
-
+            console.log(
+              'OneSignal login:',
+              error
+            );
+          }
         }
 
 
         const permission =
-          oneSignalObject
-            .Notifications
-            .permission ===
-            true;
-
-
-        const optedIn =
-          oneSignalObject
-            .User
-            .PushSubscription
-            .optedIn ===
-            true;
-
-
-        if (
-          permission &&
-          optedIn
-        ) {
-
-
-          setPushEnabled();
-
-
-          return;
-
-        }
-
-
-        setPushNotEnabled();
-
-
-        instructionElement.style.display =
-          'none';
-
-
-        statusElement.textContent =
-          'Нажмите «Включить уведомления».';
-
-
-      } catch (
-        error
-      ) {
-
-
-        console.error(
-          'Ошибка проверки push:',
-          error
-        );
-
-
-        setPushNotEnabled();
-
-      }
-
-    }
-
-
-    /*
-     * ========================================================
-     * ВКЛЮЧИТЬ PUSH
-     * ========================================================
-     */
-
-
-    async function enableNotifications() {
-
-
-      if (
-        !oneSignalReady ||
-        !oneSignalObject
-      ) {
-
-
-        statusElement.textContent =
-          'Система уведомлений ещё загружается.';
-
-
-        return;
-
-      }
-
-
-      if (
-        isIOS() &&
-        !isStandalone()
-      ) {
-
-
-        statusElement.textContent =
-          'Сначала добавьте Терру на экран Домой.';
-
-
-        instructionElement.style.display =
-          'block';
-
-
-        return;
-
-      }
-
-
-      try {
-
-
-        pushButton.disabled =
-          true;
-
-
-        pushButton.textContent =
-          'Подключаем…';
-
-
-        await oneSignalObject
-          .Notifications
-          .requestPermission();
-
-
-        const permission =
-          oneSignalObject
-            .Notifications
-            .permission ===
-            true;
+          OneSignal.Notifications
+            .permission;
 
 
         if (
           permission
         ) {
 
+          pushButton.textContent =
+            '✓ Уведомления включены';
 
-          await oneSignalObject
-            .User
-            .PushSubscription
-            .optIn();
 
+          showStatus(
+            'Push-уведомления разрешены.',
+            'success'
+          );
         }
 
 
-        await refreshPushStatus();
+        pushButton
+          .addEventListener(
+            'click',
+            async function() {
+
+              pushButton.disabled =
+                true;
 
 
-      } catch (
-        error
-      ) {
+              showStatus(
+                'Подключаем уведомления…'
+              );
 
 
-        console.error(
-          'Ошибка подключения push:',
-          error
-        );
+              try {
+
+                await OneSignal
+                  .Notifications
+                  .requestPermission();
 
 
-        pushButton.disabled =
-          false;
+                try {
+
+                  await OneSignal
+                    .User
+                    .PushSubscription
+                    .optIn();
+
+                } catch (error) {
+
+                  console.log(
+                    'OneSignal optIn:',
+                    error
+                  );
+                }
 
 
-        pushButton.textContent =
-          '🔔 Включить уведомления';
+                if (
+                  IS_CONTROL
+                ) {
+
+                  try {
+
+                    await OneSignal.login(
+                      'terra:control'
+                    );
+
+                  } catch (error) {
+
+                    console.log(
+                      'OneSignal login:',
+                      error
+                    );
+                  }
+                }
 
 
-        statusElement.textContent =
-          'Не удалось включить уведомления.';
+                if (
+                  OneSignal.Notifications
+                    .permission
+                ) {
+
+                  pushButton.textContent =
+                    '✓ Уведомления включены';
 
 
-        pushInfo.style.display =
-          'block';
+                  showStatus(
+                    'Уведомления успешно включены.',
+                    'success'
+                  );
 
+                } else {
 
-        pushInfo.textContent =
-          'Проверьте разрешение уведомлений в настройках телефона.';
+                  showStatus(
+                    'Разрешение на уведомления не выдано.',
+                    'error'
+                  );
+                }
 
-      }
+              } catch (error) {
 
-    }
+                showStatus(
+                  error &&
+                  error.message
+                    ? error.message
+                    : 'Не удалось включить уведомления.',
+                  'error'
+                );
 
+              } finally {
 
-    /*
-     * ========================================================
-     * ONESIGNAL
-     * ========================================================
-     */
-
-
-    window.OneSignalDeferred =
-      window.OneSignalDeferred ||
-      [];
-
-
-    OneSignalDeferred.push(
-
-      async function(
-        OneSignal
-      ) {
-
-
-        try {
-
-
-          await OneSignal.init({
-
-            appId:
-              ONESIGNAL_APP_ID,
-
-
-            safari_web_id:
-              ONESIGNAL_SAFARI_WEB_ID,
-
-
-            notifyButton: {
-
-              enable:
-                false
-
-            },
-
-
-            serviceWorkerPath:
-              '/terra-planner-assets/OneSignalSDKWorker.js',
-
-
-            serviceWorkerParam: {
-
-              scope:
-                '/terra-planner-assets/'
-
+                pushButton.disabled =
+                  false;
+              }
             }
-
-          });
-
-
-          oneSignalObject =
-            OneSignal;
-
-
-          oneSignalReady =
-            true;
-
-
-          await refreshPushStatus();
-
-
-        } catch (
-          error
-        ) {
-
-
-          console.error(
-            'Ошибка OneSignal:',
-            error
           );
 
+      } catch (error) {
 
-          statusElement.textContent =
-            'Планировщик доступен. Уведомления пока не подключены.';
-
-        }
-
+        showStatus(
+          'OneSignal пока не подключён: ' +
+          (
+            error &&
+            error.message
+              ? error.message
+              : String(
+                  error
+                )
+          ),
+          'error'
+        );
       }
-
-    );
-
-
-    /*
-     * ========================================================
-     * КНОПКИ
-     * ========================================================
-     */
-
-
-    openButton.addEventListener(
-      'click',
-      openPlanner
-    );
-
-
-    pushButton.addEventListener(
-      'click',
-      enableNotifications
-    );
-
-
-    /*
-     * ========================================================
-     * СТАРТ
-     * ========================================================
-     */
-
-
-    if (
-      !token
-    ) {
-
-
-      statusElement.textContent =
-        'Ссылка недействительна: отсутствует персональный токен.';
-
-
-      statusElement.className =
-        'error';
-
-
-      instructionElement.style.display =
-        'none';
-
-
-      openButton.style.display =
-        'none';
-
-
-      pushButton.style.display =
-        'none';
-
-
-    } else {
-
-
-      statusElement.textContent =
-        'Персональная ссылка подключена.';
-
-
-      /*
-       * Теперь специально НЕ переходим
-       * автоматически в Apps Script.
-       *
-       * Нам нужно дать человеку возможность
-       * сначала включить push.
-       */
-
-
-      if (
-        isStandalone()
-      ) {
-
-
-        statusElement.textContent =
-          'Проверяем уведомления…';
-
-
-        instructionElement.style.display =
-          'none';
-
-      }
-
     }
+  );
 
 
-  </script>
+  updateHint();
 
+</script>
 
 </body>
 
