@@ -334,14 +334,6 @@
     ).trim();
 
 
-  /*
-    Если в URL пришёл новый токен сотрудника
-    без mode=control — это сотруднический режим.
-
-    Так сохранённый режим Контроля не может
-    случайно "прилипнуть" к ссылке сотрудника.
-  */
-
   let MODE =
     String(
       MODE_PARAM !== null
@@ -525,6 +517,7 @@
   ) {
 
     return Promise.race([
+
       Promise.resolve(
         promise
       ),
@@ -992,24 +985,7 @@
       );
 
 
-      const browserPermission =
-        typeof Notification !==
-          'undefined'
-          ? Notification.permission
-          : 'default';
-
-
-      const oneSignalNativePermission =
-        OneSignal
-          .Notifications
-          .permissionNative;
-
-
-      let permissionGranted =
-        browserPermission ===
-          'granted' ||
-        oneSignalNativePermission ===
-          'granted' ||
+      const oneSignalPermissionBefore =
         Boolean(
           OneSignal
             .Notifications
@@ -1018,59 +994,64 @@
 
 
       if (
-        !permissionGranted
+        !oneSignalPermissionBefore
       ) {
 
-        if (
-          typeof Notification ===
-            'undefined' ||
-          typeof Notification
-            .requestPermission !==
-            'function'
-        ) {
-
-          throw new Error(
-            'На этом устройстве недоступен системный запрос разрешения на уведомления.'
-          );
-        }
-
-
         setPushStatus(
-          'Запрашиваем разрешение iPhone…'
+          'Передаём разрешение в OneSignal…'
         );
 
 
-        const nativeResult =
-          await withTimeout(
-            Notification
-              .requestPermission(),
-            15000,
-            'iPhone не завершил системный запрос разрешения на уведомления.'
-          );
+        await withTimeout(
+          OneSignal
+            .Notifications
+            .requestPermission(),
+          15000,
+          'OneSignal не завершил запрос разрешения.'
+        );
+      }
 
 
-        if (
-          nativeResult !==
-            'granted'
-        ) {
-
-          throw new Error(
-            'iPhone не выдал разрешение на уведомления. Текущее состояние: ' +
-            String(
-              nativeResult ||
-              'неизвестно'
-            )
-          );
-        }
+      const oneSignalPermissionAfter =
+        Boolean(
+          OneSignal
+            .Notifications
+            .permission
+        );
 
 
-        permissionGranted =
-          true;
+      const nativeState =
+        OneSignal
+          .Notifications
+          .permissionNative;
+
+
+      const browserState =
+        typeof Notification !==
+          'undefined'
+          ? Notification.permission
+          : 'недоступно';
+
+
+      if (
+        !oneSignalPermissionAfter &&
+        browserState !==
+          'granted'
+      ) {
+
+        throw new Error(
+          'Разрешение на уведомления не получено. ' +
+          'iPhone=' +
+          browserState +
+          ', OneSignal=' +
+          nativeState +
+          '.'
+        );
       }
 
 
       setPushStatus(
-        'Разрешение получено. Создаём push-подписку…'
+        'Создаём push-подписку…'
       );
 
 
@@ -1087,7 +1068,7 @@
       const ready =
         await waitForPushReady(
           OneSignal,
-          12000
+          15000
         );
 
 
@@ -1095,25 +1076,63 @@
         !ready
       ) {
 
-        const nativeState =
+        const finalNativeState =
           OneSignal
             .Notifications
             .permissionNative;
 
 
-        const browserState =
+        const finalBrowserState =
           typeof Notification !==
             'undefined'
             ? Notification.permission
             : 'недоступно';
 
 
+        const finalPermission =
+          Boolean(
+            OneSignal
+              .Notifications
+              .permission
+          );
+
+
+        const finalOptedIn =
+          Boolean(
+            OneSignal
+              .User
+              .PushSubscription
+              .optedIn
+          );
+
+
+        const finalToken =
+          OneSignal
+            .User
+            .PushSubscription
+            .token;
+
+
         throw new Error(
-          'Разрешение есть, но OneSignal не создал подписку. ' +
+          'OneSignal не создал подписку. ' +
           'iPhone=' +
-          browserState +
+          finalBrowserState +
           ', OneSignal=' +
-          nativeState +
+          finalNativeState +
+          ', permission=' +
+          String(
+            finalPermission
+          ) +
+          ', optedIn=' +
+          String(
+            finalOptedIn
+          ) +
+          ', token=' +
+          (
+            finalToken
+              ? 'есть'
+              : 'нет'
+          ) +
           '.'
         );
       }
