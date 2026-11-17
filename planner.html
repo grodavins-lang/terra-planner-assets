@@ -334,6 +334,14 @@
     ).trim();
 
 
+  /*
+    Если в URL пришёл новый токен сотрудника
+    без mode=control — это сотруднический режим.
+
+    Так сохранённый режим Контроля не может
+    случайно "прилипнуть" к ссылке сотрудника.
+  */
+
   let MODE =
     String(
       MODE_PARAM !== null
@@ -517,7 +525,6 @@
   ) {
 
     return Promise.race([
-
       Promise.resolve(
         promise
       ),
@@ -716,6 +723,27 @@
   }
 
 
+  let ONESIGNAL_INSTANCE =
+    null;
+
+
+  let ONESIGNAL_INIT_ERROR =
+    null;
+
+
+  let resolveOneSignalReady;
+
+
+  const ONESIGNAL_READY =
+    new Promise(
+      function(resolve) {
+
+        resolveOneSignalReady =
+          resolve;
+      }
+    );
+
+
   window.OneSignalDeferred =
     window.OneSignalDeferred ||
     [];
@@ -747,6 +775,15 @@
           }
 
         });
+
+
+        ONESIGNAL_INSTANCE =
+          OneSignal;
+
+
+        resolveOneSignalReady(
+          OneSignal
+        );
 
 
         const permission =
@@ -859,6 +896,15 @@
         error
       ) {
 
+        ONESIGNAL_INIT_ERROR =
+          error;
+
+
+        resolveOneSignalReady(
+          null
+        );
+
+
         setPushStatus(
           'Ошибка инициализации уведомлений: ' +
           (
@@ -877,7 +923,7 @@
   );
 
 
-  function enablePush() {
+  async function enablePush() {
 
     if (
       !isStandalone()
@@ -904,180 +950,210 @@
 
 
     setPushStatus(
-      'Проверяем разрешение…'
+      'Подключаем OneSignal…'
     );
 
 
-    OneSignalDeferred.push(
-      async function(OneSignal) {
+    try {
 
-        try {
-
-          const browserPermission =
-            typeof Notification !==
-              'undefined'
-              ? Notification.permission
-              : 'default';
+      let OneSignal =
+        ONESIGNAL_INSTANCE;
 
 
-          const oneSignalNativePermission =
-            OneSignal
-              .Notifications
-              .permissionNative;
+      if (
+        !OneSignal
+      ) {
 
-
-          let permissionGranted =
-            browserPermission ===
-              'granted' ||
-            oneSignalNativePermission ===
-              'granted' ||
-            Boolean(
-              OneSignal
-                .Notifications
-                .permission
-            );
-
-
-          if (
-            !permissionGranted
-          ) {
-
-            if (
-              typeof Notification ===
-                'undefined' ||
-              typeof Notification
-                .requestPermission !==
-                'function'
-            ) {
-
-              throw new Error(
-                'На этом устройстве недоступен системный запрос разрешения на уведомления.'
-              );
-            }
-
-
-            setPushStatus(
-              'Запрашиваем разрешение iPhone…'
-            );
-
-
-            const nativeResult =
-              await withTimeout(
-                Notification
-                  .requestPermission(),
-                15000,
-                'iPhone не завершил системный запрос разрешения на уведомления.'
-              );
-
-
-            if (
-              nativeResult !==
-                'granted'
-            ) {
-
-              throw new Error(
-                'iPhone не выдал разрешение на уведомления. Текущее состояние: ' +
-                String(
-                  nativeResult ||
-                  'неизвестно'
-                )
-              );
-            }
-
-
-            permissionGranted =
-              true;
-          }
-
-
-          setPushStatus(
-            'Разрешение получено. Создаём push-подписку…'
-          );
-
-
+        OneSignal =
           await withTimeout(
-            OneSignal
-              .User
-              .PushSubscription
-              .optIn(),
-            12000,
-            'OneSignal не завершил создание push-подписки.'
+            ONESIGNAL_READY,
+            10000,
+            'OneSignal SDK не завершил инициализацию.'
           );
+      }
 
 
-          const ready =
-            await waitForPushReady(
-              OneSignal,
-              12000
-            );
+      if (
+        !OneSignal
+      ) {
+
+        throw new Error(
+          ONESIGNAL_INIT_ERROR &&
+          ONESIGNAL_INIT_ERROR.message
+            ? 'Ошибка OneSignal: ' +
+              ONESIGNAL_INIT_ERROR.message
+            : 'OneSignal не инициализирован.'
+        );
+      }
 
 
-          if (
-            !ready
-          ) {
-
-            const nativeState =
-              OneSignal
-                .Notifications
-                .permissionNative;
+      setPushStatus(
+        'Проверяем разрешение…'
+      );
 
 
-            const browserState =
-              typeof Notification !==
-                'undefined'
-                ? Notification.permission
-                : 'недоступно';
+      const browserPermission =
+        typeof Notification !==
+          'undefined'
+          ? Notification.permission
+          : 'default';
 
 
-            throw new Error(
-              'Разрешение есть, но OneSignal не создал подписку. ' +
-              'iPhone=' +
-              browserState +
-              ', OneSignal=' +
-              nativeState +
-              '.'
-            );
-          }
+      const oneSignalNativePermission =
+        OneSignal
+          .Notifications
+          .permissionNative;
 
 
-          setPushStatus(
-            'Привязываем устройство к сотруднику…'
-          );
+      let permissionGranted =
+        browserPermission ===
+          'granted' ||
+        oneSignalNativePermission ===
+          'granted' ||
+        Boolean(
+          OneSignal
+            .Notifications
+            .permission
+        );
 
 
-          await loginOneSignalUser(
-            OneSignal
-          );
+      if (
+        !permissionGranted
+      ) {
 
-
-          setPushStatus(
-            'Уведомления включены.',
-            'ok'
-          );
-
-        } catch (
-          error
+        if (
+          typeof Notification ===
+            'undefined' ||
+          typeof Notification
+            .requestPermission !==
+            'function'
         ) {
 
-          setPushStatus(
-            error &&
-            error.message
-              ? error.message
-              : String(
-                  error ||
-                  'Не удалось включить уведомления.'
-                ),
-            'error'
+          throw new Error(
+            'На этом устройстве недоступен системный запрос разрешения на уведомления.'
           );
-
-        } finally {
-
-          button.disabled =
-            false;
         }
 
+
+        setPushStatus(
+          'Запрашиваем разрешение iPhone…'
+        );
+
+
+        const nativeResult =
+          await withTimeout(
+            Notification
+              .requestPermission(),
+            15000,
+            'iPhone не завершил системный запрос разрешения на уведомления.'
+          );
+
+
+        if (
+          nativeResult !==
+            'granted'
+        ) {
+
+          throw new Error(
+            'iPhone не выдал разрешение на уведомления. Текущее состояние: ' +
+            String(
+              nativeResult ||
+              'неизвестно'
+            )
+          );
+        }
+
+
+        permissionGranted =
+          true;
       }
-    );
+
+
+      setPushStatus(
+        'Разрешение получено. Создаём push-подписку…'
+      );
+
+
+      await withTimeout(
+        OneSignal
+          .User
+          .PushSubscription
+          .optIn(),
+        12000,
+        'OneSignal не завершил создание push-подписки.'
+      );
+
+
+      const ready =
+        await waitForPushReady(
+          OneSignal,
+          12000
+        );
+
+
+      if (
+        !ready
+      ) {
+
+        const nativeState =
+          OneSignal
+            .Notifications
+            .permissionNative;
+
+
+        const browserState =
+          typeof Notification !==
+            'undefined'
+            ? Notification.permission
+            : 'недоступно';
+
+
+        throw new Error(
+          'Разрешение есть, но OneSignal не создал подписку. ' +
+          'iPhone=' +
+          browserState +
+          ', OneSignal=' +
+          nativeState +
+          '.'
+        );
+      }
+
+
+      setPushStatus(
+        'Привязываем устройство к сотруднику…'
+      );
+
+
+      await loginOneSignalUser(
+        OneSignal
+      );
+
+
+      setPushStatus(
+        'Уведомления включены.',
+        'ok'
+      );
+
+    } catch (
+      error
+    ) {
+
+      setPushStatus(
+        error &&
+        error.message
+          ? error.message
+          : String(
+              error ||
+              'Не удалось включить уведомления.'
+            ),
+        'error'
+      );
+
+    } finally {
+
+      button.disabled =
+        false;
+    }
   }
 
 
