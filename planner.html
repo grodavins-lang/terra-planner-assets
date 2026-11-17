@@ -341,6 +341,7 @@
     Так сохранённый режим Контроля не может
     случайно "прилипнуть" к ссылке сотрудника.
   */
+
   let MODE =
     String(
       MODE_PARAM !== null
@@ -517,12 +518,113 @@
   }
 
 
+  function withTimeout(
+    promise,
+    timeoutMs,
+    message
+  ) {
+
+    return Promise.race([
+      Promise.resolve(
+        promise
+      ),
+
+      new Promise(
+        function(
+          resolve,
+          reject
+        ) {
+
+          window.setTimeout(
+            function() {
+
+              reject(
+                new Error(
+                  message ||
+                  'Операция заняла слишком много времени.'
+                )
+              );
+
+            },
+            timeoutMs
+          );
+        }
+      )
+    ]);
+  }
+
+
+  async function waitForPushReady(
+    OneSignal,
+    timeoutMs
+  ) {
+
+    const started =
+      Date.now();
+
+
+    while (
+      Date.now() - started <
+      timeoutMs
+    ) {
+
+      const permission =
+        Boolean(
+          OneSignal
+            .Notifications
+            .permission
+        );
+
+
+      const optedIn =
+        Boolean(
+          OneSignal
+            .User
+            .PushSubscription
+            .optedIn
+        );
+
+
+      const token =
+        OneSignal
+          .User
+          .PushSubscription
+          .token;
+
+
+      if (
+        permission &&
+        optedIn &&
+        token
+      ) {
+
+        return true;
+      }
+
+
+      await new Promise(
+        function(resolve) {
+
+          window.setTimeout(
+            resolve,
+            250
+          );
+        }
+      );
+    }
+
+
+    return false;
+  }
+
+
   /*
     Стабильный OneSignal ID сотрудника.
 
     Сам мобильный токен в OneSignal не передаём:
     используем SHA-256 от токена.
   */
+
   async function employeeExternalIdFromToken() {
 
     if (
@@ -592,32 +694,38 @@
     OneSignal
   ) {
 
+    let externalId =
+      '';
+
+
     if (
       IS_CONTROL
     ) {
 
-      await OneSignal.login(
-        'terra:control'
-      );
+      externalId =
+        'terra:control';
 
-      return;
+    } else {
+
+      if (
+        !TOKEN
+      ) {
+
+        return;
+      }
+
+
+      externalId =
+        await employeeExternalIdFromToken();
     }
 
 
-    if (
-      !TOKEN
-    ) {
-
-      return;
-    }
-
-
-    const externalId =
-      await employeeExternalIdFromToken();
-
-
-    await OneSignal.login(
-      externalId
+    await withTimeout(
+      OneSignal.login(
+        externalId
+      ),
+      10000,
+      'OneSignal не ответил при привязке пользователя.'
     );
   }
 
@@ -655,26 +763,44 @@
         });
 
 
-        await loginOneSignalUser(
-          OneSignal
-        );
-
-
         const permission =
-          OneSignal.Notifications
-            .permission;
+          Boolean(
+            OneSignal
+              .Notifications
+              .permission
+          );
 
 
         const optedIn =
-          OneSignal.User
-            .PushSubscription
-            .optedIn;
+          Boolean(
+            OneSignal
+              .User
+              .PushSubscription
+              .optedIn
+          );
 
 
         if (
           permission &&
           optedIn
         ) {
+
+          try {
+
+            await loginOneSignalUser(
+              OneSignal
+            );
+
+          } catch (
+            loginError
+          ) {
+
+            console.error(
+              'OneSignal login: ',
+              loginError
+            );
+          }
+
 
           setPushStatus(
             'Уведомления включены.',
@@ -690,7 +816,62 @@
           );
         }
 
-      } catch (error) {
+
+        OneSignal
+          .User
+          .PushSubscription
+          .addEventListener(
+            'change',
+            async function(event) {
+
+              const current =
+                event &&
+                event.current
+                  ? event.current
+                  : {};
+
+
+              if (
+                current.optedIn &&
+                current.token
+              ) {
+
+                try {
+
+                  await loginOneSignalUser(
+                    OneSignal
+                  );
+
+
+                  setPushStatus(
+                    'Уведомления включены.',
+                    'ok'
+                  );
+
+                } catch (
+                  error
+                ) {
+
+                  setPushStatus(
+                    'Уведомления разрешены, но не удалось привязать устройство: ' +
+                    (
+                      error &&
+                      error.message
+                        ? error.message
+                        : String(
+                            error
+                          )
+                    ),
+                    'error'
+                  );
+                }
+              }
+            }
+          );
+
+      } catch (
+        error
+      ) {
 
         setPushStatus(
           'Ошибка инициализации уведомлений: ' +
@@ -737,7 +918,7 @@
 
 
     setPushStatus(
-      'Запрашиваем разрешение…'
+      'Включаем уведомления…'
     );
 
 
@@ -746,59 +927,97 @@
 
         try {
 
-          await loginOneSignalUser(
-            OneSignal
+          const nativePermission =
+            typeof Notification !==
+              'undefined'
+              ? Notification.permission
+              : 'default';
+
+
+          if (
+            nativePermission !==
+            'granted'
+          ) {
+
+            setPushStatus(
+              'Запрашиваем разрешение…'
+            );
+
+
+            await withTimeout(
+              OneSignal
+                .Notifications
+                .requestPermission(),
+              15000,
+              'Браузер не завершил запрос разрешения на уведомления.'
+            );
+          }
+
+
+          const permission =
+            Boolean(
+              OneSignal
+                .Notifications
+                .permission
+            );
+
+
+          if (
+            !permission
+          ) {
+
+            throw new Error(
+              'Разрешение на уведомления не получено.'
+            );
+          }
+
+
+          setPushStatus(
+            'Создаём push-подписку…'
           );
 
 
-          await OneSignal
-            .Notifications
-            .requestPermission();
-
-
-          await OneSignal
+          OneSignal
             .User
             .PushSubscription
             .optIn();
 
 
+          const ready =
+            await waitForPushReady(
+              OneSignal,
+              12000
+            );
+
+
+          if (
+            !ready
+          ) {
+
+            throw new Error(
+              'Разрешение есть, но OneSignal не создал push-подписку. Проверь service worker и настройки сайта в OneSignal.'
+            );
+          }
+
+
+          setPushStatus(
+            'Привязываем устройство…'
+          );
+
+
           await loginOneSignalUser(
             OneSignal
           );
 
 
-          const permission =
-            OneSignal
-              .Notifications
-              .permission;
+          setPushStatus(
+            'Уведомления включены.',
+            'ok'
+          );
 
-
-          const optedIn =
-            OneSignal
-              .User
-              .PushSubscription
-              .optedIn;
-
-
-          if (
-            permission &&
-            optedIn
-          ) {
-
-            setPushStatus(
-              'Уведомления включены.',
-              'ok'
-            );
-
-          } else {
-
-            setPushStatus(
-              'Разрешение на уведомления не получено.',
-              'error'
-            );
-          }
-
-        } catch (error) {
+        } catch (
+          error
+        ) {
 
           setPushStatus(
             error &&
