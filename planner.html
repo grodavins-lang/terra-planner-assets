@@ -334,14 +334,6 @@
     ).trim();
 
 
-  /*
-    Если в URL пришёл новый токен сотрудника
-    без mode=control — это сотруднический режим.
-
-    Так сохранённый режим Контроля не может
-    случайно "прилипнуть" к ссылке сотрудника.
-  */
-
   let MODE =
     String(
       MODE_PARAM !== null
@@ -525,6 +517,7 @@
   ) {
 
     return Promise.race([
+
       Promise.resolve(
         promise
       ),
@@ -617,13 +610,6 @@
     return false;
   }
 
-
-  /*
-    Стабильный OneSignal ID сотрудника.
-
-    Сам мобильный токен в OneSignal не передаём:
-    используем SHA-256 от токена.
-  */
 
   async function employeeExternalIdFromToken() {
 
@@ -918,7 +904,7 @@
 
 
     setPushStatus(
-      'Включаем уведомления…'
+      'Проверяем разрешение…'
     );
 
 
@@ -927,34 +913,24 @@
 
         try {
 
-          const nativePermission =
+          const browserPermission =
             typeof Notification !==
               'undefined'
               ? Notification.permission
               : 'default';
 
 
-          if (
-            nativePermission !==
-            'granted'
-          ) {
-
-            setPushStatus(
-              'Запрашиваем разрешение…'
-            );
+          const oneSignalNativePermission =
+            OneSignal
+              .Notifications
+              .permissionNative;
 
 
-            await withTimeout(
-              OneSignal
-                .Notifications
-                .requestPermission(),
-              15000,
-              'Браузер не завершил запрос разрешения на уведомления.'
-            );
-          }
-
-
-          const permission =
+          let permissionGranted =
+            browserPermission ===
+              'granted' ||
+            oneSignalNativePermission ===
+              'granted' ||
             Boolean(
               OneSignal
                 .Notifications
@@ -963,24 +939,70 @@
 
 
           if (
-            !permission
+            !permissionGranted
           ) {
 
-            throw new Error(
-              'Разрешение на уведомления не получено.'
+            if (
+              typeof Notification ===
+                'undefined' ||
+              typeof Notification
+                .requestPermission !==
+                'function'
+            ) {
+
+              throw new Error(
+                'На этом устройстве недоступен системный запрос разрешения на уведомления.'
+              );
+            }
+
+
+            setPushStatus(
+              'Запрашиваем разрешение iPhone…'
             );
+
+
+            const nativeResult =
+              await withTimeout(
+                Notification
+                  .requestPermission(),
+                15000,
+                'iPhone не завершил системный запрос разрешения на уведомления.'
+              );
+
+
+            if (
+              nativeResult !==
+                'granted'
+            ) {
+
+              throw new Error(
+                'iPhone не выдал разрешение на уведомления. Текущее состояние: ' +
+                String(
+                  nativeResult ||
+                  'неизвестно'
+                )
+              );
+            }
+
+
+            permissionGranted =
+              true;
           }
 
 
           setPushStatus(
-            'Создаём push-подписку…'
+            'Разрешение получено. Создаём push-подписку…'
           );
 
 
-          OneSignal
-            .User
-            .PushSubscription
-            .optIn();
+          await withTimeout(
+            OneSignal
+              .User
+              .PushSubscription
+              .optIn(),
+            12000,
+            'OneSignal не завершил создание push-подписки.'
+          );
 
 
           const ready =
@@ -994,14 +1016,32 @@
             !ready
           ) {
 
+            const nativeState =
+              OneSignal
+                .Notifications
+                .permissionNative;
+
+
+            const browserState =
+              typeof Notification !==
+                'undefined'
+                ? Notification.permission
+                : 'недоступно';
+
+
             throw new Error(
-              'Разрешение есть, но OneSignal не создал push-подписку. Проверь service worker и настройки сайта в OneSignal.'
+              'Разрешение есть, но OneSignal не создал подписку. ' +
+              'iPhone=' +
+              browserState +
+              ', OneSignal=' +
+              nativeState +
+              '.'
             );
           }
 
 
           setPushStatus(
-            'Привязываем устройство…'
+            'Привязываем устройство к сотруднику…'
           );
 
 
